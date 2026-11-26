@@ -107,7 +107,7 @@ def main() -> None:
             ) from error
         print("Removed previous Git metadata")
     run("git", "init")
-    run("uv", "sync", "--frozen")
+    run("uv", "sync")
     print("Project is ready. Start services with: docker compose -f docker/docker-compose.yaml up --build")
 
 
