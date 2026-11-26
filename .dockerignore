@@ -1,0 +1,10 @@
+.git
+.idea
+.venv
+__pycache__
+*.py[cod]
+.env
+application/.env
+docker/.env
+docker/users.acl
+docker/volumes
