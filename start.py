@@ -8,6 +8,7 @@ repository whose Git history you want to keep.
 from __future__ import annotations
 
 import os
+import re
 import secrets
 import shutil
 import subprocess
@@ -18,6 +19,26 @@ from pathlib import Path
 ROOT_DIR = Path(__file__).resolve().parent
 DOCKER_DIR = ROOT_DIR / "docker"
 APPLICATION_DIR = ROOT_DIR / "application"
+
+
+def update_project_name() -> None:
+    """Set the package name to the directory where the script was started."""
+    pyproject_path = ROOT_DIR / "pyproject.toml"
+    project_name = Path.cwd().name
+    content = pyproject_path.read_text(encoding="utf-8")
+
+    updated_content, replacements = re.subn(
+        r'(?ms)(^\[project\]\s*$.*?^name\s*=\s*)"[^"]*"',
+        rf'\g<1>"{project_name}"',
+        content,
+        count=1,
+    )
+    if replacements != 1:
+        raise RuntimeError("Cannot find [project].name in pyproject.toml.")
+
+    if updated_content != content:
+        pyproject_path.write_text(updated_content, encoding="utf-8")
+        print(f"Set project name to {project_name}")
 
 
 def write_if_missing(path: Path, content: str) -> None:
@@ -51,6 +72,7 @@ def main() -> None:
     if not (ROOT_DIR / "pyproject.toml").is_file():
         raise RuntimeError("Run start.py from the root of the copied project.")
 
+    update_project_name()
     DOCKER_DIR.mkdir(exist_ok=True)
     APPLICATION_DIR.mkdir(exist_ok=True)
 
